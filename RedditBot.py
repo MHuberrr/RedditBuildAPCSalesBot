@@ -1,18 +1,17 @@
 import praw
-import pushbullet
 import config
 
-#pushbullet authentication
-pb = pushbullet.Pushbullet(config.pushbulletAuth)
+# reddit authentication
+reddit = praw.Reddit(username=config.username,
+                     password=config.password,
+                     client_id=config.client_id,
+                     client_secret=config.client_secret,
+                     user_agent=config.user_agent)
 
-#reddit authentication
-reddit = praw.Reddit(client_id=config.redditID,
-                     client_secret=config.redditSecretKey,
-                     user_agent='bot')
+lookingFor = "[GPU]"
 
 subreddit = reddit.subreddit('buildapcsales')                     
 for submission in subreddit.stream.submissions():
-    if submission.title.startswith("[GPU]"):
+    if submission.title.startswith(lookingFor):
         print(submission.title)
-        pb.push_note("",submission.title)
-
+        reddit.redditor(config.message_to).message(lookingFor, submission.title)
